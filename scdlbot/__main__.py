@@ -51,6 +51,8 @@ def main():
 
     store_chat_id = int(os.getenv('STORE_CHAT_ID', '0'))
     no_flood_chat_ids = list(map(int, os.getenv('NO_FLOOD_CHAT_IDS', '0').split(',')))
+    no_links_chat_ids = list(map(int, os.getenv('NO_LINKS_CHAT_IDS', '0').split(',')))
+
     dl_timeout = int(os.getenv('DL_TIMEOUT', '300'))
     dl_dir = os.path.expanduser(os.getenv('DL_DIR', '/tmp/scdlbot'))
     chat_storage_file = os.path.expanduser(os.getenv('CHAT_STORAGE', '/tmp/scdlbotdata'))
@@ -64,7 +66,8 @@ def main():
         source_ips = source_ips.split(',')
 
     scdlbot = ScdlBot(tg_bot_token, proxy,
-                      store_chat_id, no_flood_chat_ids, alert_chat_ids,
+                      store_chat_id, no_flood_chat_ids,
+                      no_links_chat_ids, alert_chat_ids,
                       dl_dir, dl_timeout, max_convert_file_size,
                       chat_storage_file, app_url,
                       serve_audio, cookies_file, source_ips)

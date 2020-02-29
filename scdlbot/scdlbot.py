@@ -37,7 +37,8 @@ REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing requ
 class ScdlBot:
 
     def __init__(self, tg_bot_token, proxy=None,
-                 store_chat_id=None, no_flood_chat_ids=None, alert_chat_ids=None,
+                 store_chat_id=None, no_flood_chat_ids=[],
+                 no_links_chat_ids=[], alert_chat_ids=[],
                  dl_dir="/tmp/scdlbot", dl_timeout=300, max_convert_file_size=80_000_000,
                  chat_storage_file="/tmp/scdlbotdata", app_url=None,
                  serve_audio=False, cookies_file=None, source_ips=None):
@@ -70,7 +71,8 @@ class ScdlBot:
         self.chat_storage = shelve.open(chat_storage_file, writeback=True)
         for chat_id in no_flood_chat_ids:
             self.init_chat(chat_id=chat_id, chat_type=Chat.PRIVATE if chat_id > 0 else Chat.SUPERGROUP, flood="no")
-        self.ALERT_CHAT_IDS = set(alert_chat_ids) if alert_chat_ids else set()
+        self.NO_LINKS_CHAT_IDS = set(no_links_chat_ids)
+        self.ALERT_CHAT_IDS = set(alert_chat_ids)
         self.STORE_CHAT_ID = store_chat_id
         self.DL_DIR = dl_dir
         self.COOKIES_DOWNLOAD_FILE = "/tmp/scdlbot_cookies.txt"
@@ -679,8 +681,12 @@ class ScdlBot:
                                 url = url.replace("http://", "").replace("https://", "")
                             else:
                                 url = shorten_url(url)
-                            caption = "@{} _got it from_ [{}]({}){}".format(self.bot_username.replace("_", "\_"),
-                                                                            source, url, addition.replace("_", "\_"))
+                            if chat_id in self.NO_LINKS_CHAT_IDS:
+                                caption = "@{} _got it from_ {}{}".format(self.bot_username.replace("_", "\_"),
+                                                                          source, addition.replace("_", "\_"))
+                            else:
+                                caption = "@{} _got it from_ [{}]({}){}".format(self.bot_username.replace("_", "\_"),
+                                                                                source, url, addition.replace("_", "\_"))
                             # logger.info(caption)
                         sent_audio_ids = self.send_audio_file_parts(bot, chat_id, file_parts,
                                                                     reply_to_message_id if flood == "yes" else None,
