@@ -1,6 +1,10 @@
 Version history
 ===============
 
+0.13.1 (2020-02-29)
+-----------------------
+* add config option to disable source links in captions for some chats
+
 0.13.0 (2020-02-28)
 -----------------------
 * upgrade to python-telegram-bot version 12
